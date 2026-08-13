@@ -90,7 +90,7 @@ export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
           </div>
           <div className="flex justify-between items-center">
             <span>Disponibilidad:</span>
-            <span className="text-emerald-400 font-medium">24/7 Automatizado</span>
+            <span className="text-emerald-400 font-medium">Atención automatizada</span>
           </div>
         </div>
 
@@ -108,7 +108,7 @@ export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
       <div className="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3.5 space-y-2">
         <div className="font-semibold text-slate-200 flex items-center gap-1.5">
           <Shield className="w-3.5 h-3.5 text-blue-400" />
-          Seguridad & Protocolo CCG
+          Seguridad & Protocolo
         </div>
         <ul className="list-disc list-inside text-[11px] text-slate-400 space-y-1">
           <li>Nunca compartas contraseñas personales.</li>
@@ -121,7 +121,7 @@ export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
       <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-400 space-y-1">
         <div className="flex justify-between">
           <span>Plataforma:</span>
-          <span>CCG Engine v2.4</span>
+          <span>Engine v2.4</span>
         </div>
         <div className="flex justify-between">
           <span>Canal:</span>

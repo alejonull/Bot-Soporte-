@@ -57,7 +57,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
         {!isUser && (
           <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-slate-700/50 text-[11px] font-medium text-slate-400">
             <span className="flex items-center gap-1 text-blue-400 font-semibold">
-              CCG Soporte Técnico
+              Soporte Técnico
             </span>
             <div className="flex items-center space-x-1">
               <span className="text-[10px] text-slate-400">{formatTime(message.timestamp)}</span>

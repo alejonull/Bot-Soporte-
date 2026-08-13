@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-lg font-bold tracking-tight text-slate-100 flex items-center gap-2">
-                CCG Soporte Técnico
+               Soporte Técnico
               </h1>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>

@@ -52,7 +52,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               <span className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
             </div>
             <span className="text-xs font-medium text-slate-300">
-              CCG está analizando tu solicitud...
+              Bot está analizando tu solicitud...
             </span>
           </div>
         </div>

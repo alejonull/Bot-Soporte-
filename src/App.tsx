@@ -22,7 +22,7 @@ export default function App() {
   const initialWelcomeMessage: ChatMessage = {
     id: 'welcome-01',
     sender: 'assistant',
-    text: 'Hola, soy el asistente virtual de CCG. Cuéntame qué problema estás teniendo con tu equipo y te ayudaré a revisarlo.',
+    text: 'Hola, soy el asistente virtual. Cuéntame qué problema estás teniendo con tu equipo y te ayudaré a revisarlo.',
     timestamp: new Date(),
   };
 

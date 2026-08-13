@@ -1,0 +1,6 @@
+{
+  "name": "CCG Soporte Técnico",
+  "description": "Plataforma web profesional de asistencia técnica en línea y soporte tecnológico corporativo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

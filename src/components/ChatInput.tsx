@@ -13,9 +13,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   inputPreset = '',
 }) => {
   const [text, setText] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Update text if preset topic selected
   useEffect(() => {
     if (inputPreset) {
       setText(inputPreset);
@@ -25,7 +25,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     }
   }, [inputPreset]);
 
-  // Auto resize textarea
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 640px)');
+
+    const updateIsMobile = () => {
+      setIsMobile(mediaQuery.matches);
+    };
+
+    updateIsMobile();
+    mediaQuery.addEventListener('change', updateIsMobile);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateIsMobile);
+    };
+  }, []);
+
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -46,7 +60,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enter without Shift sends message
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -54,10 +67,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="p-3 sm:p-4 bg-slate-900 border-t border-slate-800">
+    <div className="px-3 py-2.5 sm:p-4 bg-slate-900 border-t border-slate-800">
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative">
-        <div className="relative flex items-end rounded-xl bg-slate-800/90 border border-slate-700/80 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/50 shadow-inner transition-all">
-          
+        <div className="relative flex items-center sm:items-end rounded-xl bg-slate-800/90 border border-slate-700/80 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/50 shadow-inner transition-all">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -65,11 +77,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            placeholder="Describe tu problema técnico aquí... (Presiona Enter para enviar)"
-            className="w-full bg-transparent text-slate-100 placeholder-slate-400 text-sm px-4 py-3.5 focus:outline-none resize-none max-h-32 min-h-[48px] disabled:opacity-50"
+            placeholder={isMobile ? 'Describe tu problema...' : 'Describe tu problema tecnico aqui­...'}
+            className="w-full bg-transparent text-slate-100 placeholder-slate-400 text-[15px] sm:text-sm px-4 py-3.5 focus:outline-none resize-none max-h-32 min-h-[52px] sm:min-h-[48px] disabled:opacity-50"
           />
 
-          <div className="flex items-center p-2 space-x-2">
+          <div className="flex items-center self-stretch px-2 py-2 space-x-2">
             <button
               type="submit"
               disabled={!text.trim() || isLoading}
@@ -89,8 +101,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         </div>
 
-        {/* Keyboard shortcut hint */}
-        <div className="flex justify-between items-center px-2 mt-1.5 text-[11px] text-slate-400">
+        <div className="hidden sm:flex justify-between items-center px-2 mt-1.5 text-[11px] text-slate-400">
           <span className="flex items-center gap-1">
             <CornerDownLeft className="w-3 h-3 text-slate-400" />
             <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px]">Enter</kbd> para enviar

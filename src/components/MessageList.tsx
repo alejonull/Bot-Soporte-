@@ -60,7 +60,7 @@ export const MessageList: React.FC<MessageListProps> = ({
 
       {/* Suggested Quick Topics (shown when conversation is brief) */}
       {messages.length <= 1 && onSelectTopic && (
-        <div className="mt-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 max-w-xl mx-auto shadow-inner">
+        <div className="mt-4 sm:mt-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 max-w-xl mx-auto shadow-inner">
           <div className="flex items-center space-x-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2.5">
             <Terminal className="w-3.5 h-3.5 text-blue-400" />
             <span>Consultas Frecuentes de Soporte</span>

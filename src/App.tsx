@@ -6,15 +6,12 @@ import { Header } from './components/Header';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { SessionInfoPanel } from './components/SessionInfoPanel';
-import { WebhookConfigModal } from './components/WebhookConfigModal';
 import { MessageSquare, Info, ShieldCheck } from 'lucide-react';
 
 export default function App() {
   const [sessionId, setSessionId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [webhookUrl, setWebhookUrl] = useState<string>('');
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [presetTopic, setPresetTopic] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'chat' | 'info'>('chat');
 
@@ -31,7 +28,6 @@ export default function App() {
     const sid = getOrCreateSessionId();
     setSessionId(sid);
     setMessages([initialWelcomeMessage]);
-    setWebhookUrl(getWebhookUrl());
   }, []);
 
   // Handler for user sending a message
@@ -52,8 +48,7 @@ export default function App() {
       setIsLoading(true);
 
       try {
-        // 2. Call n8n webhook via chatService
-        const botAnswer = await sendChatMessage(text, sessionId, webhookUrl);
+        const botAnswer = await sendChatMessage(text, sessionId, getWebhookUrl());
 
         // 3. Append assistant response
         const botMsgId = `bot-${Date.now()}`;
@@ -83,7 +78,7 @@ export default function App() {
         setIsLoading(false);
       }
     },
-    [isLoading, sessionId, webhookUrl]
+    [isLoading, sessionId]
   );
 
   // Handler for restarting session
@@ -99,16 +94,6 @@ export default function App() {
     ]);
   }, []);
 
-  // Handler for custom webhook update
-  const handleSaveWebhookUrl = (url: string) => {
-    try {
-      localStorage.setItem('ccg_custom_webhook_url', url);
-    } catch (e) {
-      console.error('Error guardando webhook custom:', e);
-    }
-    setWebhookUrl(url);
-  };
-
   const handleSelectTopic = (topic: string) => {
     setPresetTopic(topic);
   };
@@ -118,8 +103,6 @@ export default function App() {
       
       {/* Top Header */}
       <Header
-        webhookConfigured={Boolean(webhookUrl)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
         onResetSession={handleResetSession}
       />
 
@@ -177,22 +160,10 @@ export default function App() {
             activeTab === 'info' ? 'flex w-full' : 'hidden lg:flex'
           }`}
         >
-          <SessionInfoPanel
-            sessionId={sessionId}
-            webhookUrl={webhookUrl}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-          />
+          <SessionInfoPanel sessionId={sessionId} />
         </div>
 
       </main>
-
-      {/* Webhook Settings Modal */}
-      <WebhookConfigModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        currentUrl={webhookUrl}
-        onSaveUrl={handleSaveWebhookUrl}
-      />
 
     </div>
   );

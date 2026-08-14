@@ -11,34 +11,23 @@ export class ChatServiceError extends Error {
 }
 
 /**
- * Gets the configured webhook URL from environment variables or local override storage
+ * Gets the configured webhook URL from environment variables.
  */
 export function getWebhookUrl(): string {
-  // Check runtime/build env variable
   const envUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     return envUrl.trim();
-  }
-
-  // Fallback check in localStorage for client-side demo testing
-  try {
-    const localUrl = localStorage.getItem('ccg_custom_webhook_url');
-    if (localUrl && localUrl.trim() !== '') {
-      return localUrl.trim();
-    }
-  } catch (err) {
-    console.error('Error accediendo a localStorage para webhook url:', err);
   }
 
   return '';
 }
 
 /**
- * Sends a message to the n8n technical support webhook.
- * 
+ * Sends a message to the configured support webhook.
+ *
  * @param message Written text message from user
  * @param sessionId Unique session identifier
- * @param overrideUrl Optional custom URL if set via UI
+ * @param overrideUrl Optional custom URL if set internally
  * @returns Response string from the chatbot
  */
 export async function sendChatMessage(
@@ -49,7 +38,7 @@ export async function sendChatMessage(
   const webhookUrl = overrideUrl?.trim() || getWebhookUrl();
 
   if (!webhookUrl) {
-    console.error('CRÍTICO: No se ha configurado VITE_N8N_WEBHOOK_URL en las variables de entorno.');
+    console.error('CRÍTICO: No se ha configurado la URL del servicio de soporte.');
     throw new ChatServiceError('No fue posible contactar el servicio de soporte. Inténtalo nuevamente.');
   }
 
@@ -69,13 +58,13 @@ export async function sendChatMessage(
     });
 
     if (!response.ok) {
-      console.error(`Error HTTP desde el webhook n8n: ${response.status} ${response.statusText}`);
+      console.error(`Error HTTP desde el servicio de soporte: ${response.status} ${response.statusText}`);
       throw new ChatServiceError('No fue posible contactar el servicio de soporte. Inténtalo nuevamente.');
     }
 
     const data: unknown = await response.json();
 
-    // Parse n8n response: can be an object { respuesta: "..." } or array [{ respuesta: "..." }]
+    // Parse response: can be an object { respuesta: "..." } or array [{ respuesta: "..." }]
     let botResponseText = '';
 
     if (Array.isArray(data) && data.length > 0) {
@@ -91,7 +80,7 @@ export async function sendChatMessage(
     }
 
     if (!botResponseText || botResponseText.trim() === '') {
-      console.error('El webhook de n8n respondió sin el campo esperado "respuesta":', data);
+      console.error('El servicio respondió sin el campo esperado "respuesta":', data);
       throw new ChatServiceError('No fue posible contactar el servicio de soporte. Inténtalo nuevamente.');
     }
 
@@ -100,7 +89,7 @@ export async function sendChatMessage(
     if (error instanceof ChatServiceError) {
       throw error;
     }
-    console.error('Excepción capturada al comunicarse con n8n:', error);
+    console.error('Excepción capturada al comunicarse con el servicio de soporte:', error);
     throw new ChatServiceError('No fue posible contactar el servicio de soporte. Inténtalo nuevamente.', error);
   }
 }

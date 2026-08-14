@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
-import { Key, Shield, Wifi, Clock, Copy, Check, Server, HelpCircle, Terminal } from 'lucide-react';
+import { Key, Shield, Copy, Check, Server } from 'lucide-react';
 
 interface SessionInfoPanelProps {
   sessionId: string;
-  webhookUrl: string;
-  onOpenSettings: () => void;
 }
 
-export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
-  sessionId,
-  webhookUrl,
-  onOpenSettings,
-}) => {
+export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({ sessionId }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopySession = () => {
@@ -20,11 +14,8 @@ export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const isConfigured = Boolean(webhookUrl);
-
   return (
     <aside className="w-full lg:w-80 bg-slate-900 border-l border-slate-800 p-4 sm:p-5 flex flex-col space-y-5 text-slate-300 text-xs">
-      
       {/* Session Details Card */}
       <div className="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3.5 space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-slate-700/60">
@@ -55,80 +46,45 @@ export const SessionInfoPanel: React.FC<SessionInfoPanelProps> = ({
             </button>
           </div>
           <p className="text-[10px] text-slate-400 mt-1.5">
-            Este ID se almacena en tu navegador para dar seguimiento continuo a tu ticket técnico.
+            Guarda este código por si necesitas continuar tu solicitud más adelante.
           </p>
         </div>
       </div>
 
-      {/* Webhook Status Card */}
+      {/* Service Status Card */}
       <div className="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3.5 space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-slate-200 flex items-center gap-1.5">
             <Server className="w-3.5 h-3.5 text-indigo-400" />
-            Conexión de Servicio
+            Estado del servicio
           </span>
-          <span
-            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 ${
-              isConfigured
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'bg-emerald-400' : 'bg-amber-400 animate-ping'}`} />
-            {isConfigured ? 'Conectado' : 'Pendiente'}
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            Conectado
           </span>
         </div>
 
         <div className="space-y-1.5 text-slate-400 text-[11px]">
           <div className="flex justify-between items-center">
-            <span>Protocolo:</span>
-            <span className="font-mono text-slate-300">HTTPS POST</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span>Servidor Backend:</span>
-            <span className="font-mono text-slate-300">n8n Webhook</span>
-          </div>
-          <div className="flex justify-between items-center">
             <span>Disponibilidad:</span>
             <span className="text-emerald-400 font-medium">Atención automatizada</span>
           </div>
         </div>
-
-        {!isConfigured && (
-          <button
-            onClick={onOpenSettings}
-            className="w-full mt-2 py-1.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 rounded-lg text-xs font-medium transition-colors text-center block"
-          >
-            Configurar URL de Webhook
-          </button>
-        )}
       </div>
 
-      {/* Security & Protocol */}
+      {/* Security */}
       <div className="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3.5 space-y-2">
         <div className="font-semibold text-slate-200 flex items-center gap-1.5">
           <Shield className="w-3.5 h-3.5 text-blue-400" />
-          Seguridad & Protocolo
+          Seguridad
         </div>
         <ul className="list-disc list-inside text-[11px] text-slate-400 space-y-1">
           <li>Nunca compartas contraseñas personales.</li>
-          <li>Los diagnósticos son confidenciales.</li>
-          <li>Comunicación encriptada punto a punto.</li>
+          <li>La información se usa únicamente para atender tu solicitud.</li>
+          <li>Conexión segura mediante HTTPS.</li>
+          <li>No compartas códigos de verificación ni información bancaria.</li>
         </ul>
       </div>
-
-      {/* Tech Specifications */}
-      <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-400 space-y-1">
-        <div className="flex justify-between">
-          <span>Plataforma:</span>
-          <span>Engine v2.4</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Canal:</span>
-          <span>Web Client UI</span>
-        </div>
-      </div>
-
     </aside>
   );
 };

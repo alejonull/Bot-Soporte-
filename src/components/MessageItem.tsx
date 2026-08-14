@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 import { ChatMessage } from '../types';
 import { User, Cpu, Copy, Check, AlertCircle } from 'lucide-react';
 
@@ -28,13 +31,19 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const markdownClassName =
+    'space-y-3 text-sm leading-relaxed break-words text-slate-100 ' +
+    '[&>p]:m-0 [&>p+*]:mt-3 [&>ul]:my-2 [&>ol]:my-2 [&>ul]:pl-5 [&>ol]:pl-5 ' +
+    '[&>ul]:space-y-1 [&>ol]:space-y-1 [&>li]:my-1 [&>li>p]:m-0 ' +
+    '[&>strong]:font-semibold [&>strong]:text-slate-50 [&>em]:italic [&>em]:text-slate-50 ' +
+    '[&>br]:block [&>br]:h-0';
+
   return (
     <div
       className={`flex w-full mb-4 space-x-3 max-w-full ${
         isUser ? 'justify-end' : 'justify-start'
       }`}
     >
-      {/* Assistant Avatar */}
       {!isUser && (
         <div className="flex-shrink-0 mt-1">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-sm ring-1 ring-blue-500/20">
@@ -43,7 +52,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
         </div>
       )}
 
-      {/* Message Container */}
       <div
         className={`relative group max-w-[85%] sm:max-w-[78%] md:max-w-[70%] rounded-2xl px-4 py-3 shadow-sm transition-all ${
           isUser
@@ -53,7 +61,6 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
             : 'bg-slate-800/90 border border-slate-700/80 text-slate-100 rounded-bl-none'
         }`}
       >
-        {/* Header inside Assistant bubble */}
         {!isUser && (
           <div className="flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-slate-700/50 text-[11px] font-medium text-slate-400">
             <span className="flex items-center gap-1 text-blue-400 font-semibold">
@@ -72,26 +79,52 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
           </div>
         )}
 
-        {/* User Header */}
         {isUser && (
           <div className="flex items-center justify-end text-[10px] text-blue-200/80 mb-1">
             <span>{formatTime(message.timestamp)}</span>
           </div>
         )}
 
-        {/* Message Content */}
-        <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-          {message.isError && (
-            <div className="flex items-start gap-2 text-rose-300 font-medium mb-1">
+        <div
+          className={
+            isUser
+              ? 'text-sm leading-relaxed whitespace-pre-wrap break-words'
+              : message.isError
+              ? 'text-sm leading-relaxed break-words'
+              : markdownClassName
+          }
+        >
+          {message.isError && !isUser ? (
+            <div className="flex items-start gap-2 text-rose-300 font-medium">
               <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-              <span>{message.text}</span>
+              <div className="prose prose-invert max-w-none prose-p:my-0 prose-ul:my-2 prose-ol:my-2 prose-li:my-1">
+                <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]} skipHtml>
+                  {message.text}
+                </ReactMarkdown>
+              </div>
             </div>
+          ) : !isUser ? (
+            <ReactMarkdown
+              remarkPlugins={[remarkBreaks, remarkGfm]}
+              skipHtml
+              components={{
+                p: ({ children }) => <p className="m-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold text-slate-50">{children}</strong>,
+                em: ({ children }) => <em className="italic text-slate-50">{children}</em>,
+                ul: ({ children }) => <ul className="my-2 list-disc space-y-1 pl-5">{children}</ul>,
+                ol: ({ children }) => <ol className="my-2 list-decimal space-y-1 pl-5">{children}</ol>,
+                li: ({ children }) => <li className="my-1">{children}</li>,
+                br: () => <br />,
+              }}
+            >
+              {message.text}
+            </ReactMarkdown>
+          ) : (
+            message.text
           )}
-          {!message.isError && message.text}
         </div>
       </div>
 
-      {/* User Avatar */}
       {isUser && (
         <div className="flex-shrink-0 mt-1">
           <div className="w-8 h-8 rounded-lg bg-slate-700 text-slate-200 flex items-center justify-center ring-1 ring-slate-600/50">

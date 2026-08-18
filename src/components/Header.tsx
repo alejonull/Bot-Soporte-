@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ onResetSession }) => {
               Soporte Técnico
             </h1>
             <p className="mt-0.5 text-xs text-[#74706A]">
-              Workspace de soporte premium
+              Workspace de soporte
             </p>
           </div>
         </div>

@@ -2,20 +2,23 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ChatMessage } from './types';
 import { getOrCreateSessionId, resetSessionId } from './utils/session';
 import { sendChatMessage, getWebhookUrl } from './services/chatService';
+import { analyzeConversation, NexuAnalysis } from './services/nexuService';
 import { Header } from './components/Header';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { SessionInfoPanel } from './components/SessionInfoPanel';
-import { MessageSquare, Info, ShieldCheck } from 'lucide-react';
+import { MessageSquare, Info, PanelLeft } from 'lucide-react';
+import { NexuPanel } from './components/NexuPanel';
 
 export default function App() {
   const [sessionId, setSessionId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [presetTopic, setPresetTopic] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'info'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'nexu' | 'info'>('chat');
+  const [nexuAnalysis, setNexuAnalysis] = useState<NexuAnalysis | null>(null);
+  const [isNexuLoading, setIsNexuLoading] = useState<boolean>(false);
 
-  // Initial welcome message requirement
   const initialWelcomeMessage: ChatMessage = {
     id: 'welcome-01',
     sender: 'assistant',
@@ -23,14 +26,12 @@ export default function App() {
     timestamp: new Date(),
   };
 
-  // Initialize session and state on mount
   useEffect(() => {
     const sid = getOrCreateSessionId();
     setSessionId(sid);
     setMessages([initialWelcomeMessage]);
   }, []);
 
-  // Handler for user sending a message
   const handleSendMessage = useCallback(
     async (text: string) => {
       if (!text.trim() || isLoading) return;
@@ -43,14 +44,12 @@ export default function App() {
         timestamp: new Date(),
       };
 
-      // 1. Immediately show user message
       setMessages((prev) => [...prev, newUserMessage]);
       setIsLoading(true);
 
       try {
         const botAnswer = await sendChatMessage(text, sessionId, getWebhookUrl());
 
-        // 3. Append assistant response
         const botMsgId = `bot-${Date.now()}`;
         const newBotMessage: ChatMessage = {
           id: botMsgId,
@@ -59,11 +58,35 @@ export default function App() {
           timestamp: new Date(),
         };
 
-        setMessages((prev) => [...prev, newBotMessage]);
+        const updatedMessages = [...messages, newUserMessage, newBotMessage];
+        setMessages(updatedMessages);
+
+        setIsNexuLoading(true);
+
+        try {
+          const conversationForNexu = updatedMessages
+            .filter((message) => !message.isError)
+            .map((message) => ({
+              role:
+                message.sender === 'user'
+                  ? ('user' as const)
+                  : ('assistant' as const),
+              content: message.text,
+            }));
+
+          const analysis = await analyzeConversation(conversationForNexu);
+
+          setNexuAnalysis(analysis);
+
+          console.log('NEXU ANALYSIS:', analysis);
+        } catch (nexuError) {
+          console.error('Error al analizar conversaciòn con NEXU:', nexuError);
+        } finally {
+          setIsNexuLoading(false);
+        }
       } catch (error) {
         console.error('Error al enviar mensaje desde App:', error);
 
-        // Required controlled error message
         const errorMsgId = `error-${Date.now()}`;
         const errorMessage: ChatMessage = {
           id: errorMsgId,
@@ -78,10 +101,9 @@ export default function App() {
         setIsLoading(false);
       }
     },
-    [isLoading, sessionId]
+    [isLoading, sessionId, messages]
   );
 
-  // Handler for restarting session
   const handleResetSession = useCallback(() => {
     const newSid = resetSessionId();
     setSessionId(newSid);
@@ -92,6 +114,8 @@ export default function App() {
         timestamp: new Date(),
       },
     ]);
+    setNexuAnalysis(null);
+    setIsNexuLoading(false);
   }, []);
 
   const handleSelectTopic = (topic: string) => {
@@ -99,72 +123,81 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 font-sans overflow-hidden antialiased select-none">
-      
-      {/* Top Header */}
-      <Header
-        onResetSession={handleResetSession}
-      />
+    <div className="app-shell flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100 antialiased select-none">
+      <Header onResetSession={handleResetSession} />
 
-      {/* Mobile Navigation Tabs (for small screens) */}
-      <div className="flex lg:hidden bg-slate-900 border-b border-slate-800 text-xs font-semibold">
-        <button
-          onClick={() => setActiveTab('chat')}
-          className={`flex-1 py-2.5 flex items-center justify-center space-x-2 border-b-2 transition-colors ${
-            activeTab === 'chat'
-              ? 'border-blue-500 text-blue-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span>Chat de Soporte</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('info')}
-          className={`flex-1 py-2.5 flex items-center justify-center space-x-2 border-b-2 transition-colors ${
-            activeTab === 'info'
-              ? 'border-blue-500 text-blue-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Info className="w-4 h-4" />
-          <span>Detalles de Sesión</span>
-        </button>
+      <div className="lg:hidden border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
+        <div className="grid grid-cols-3 text-xs font-semibold">
+          <button
+            onClick={() => setActiveTab('chat')}
+            className={`mobile-tab ${activeTab === 'chat' ? 'mobile-tab--active' : ''}`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span>Chat</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('nexu')}
+            className={`mobile-tab ${activeTab === 'nexu' ? 'mobile-tab--active' : ''}`}
+          >
+            <PanelLeft className="h-4 w-4" />
+            <span>NEXU</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('info')}
+            className={`mobile-tab ${activeTab === 'info' ? 'mobile-tab--active' : ''}`}
+          >
+            <Info className="h-4 w-4" />
+            <span>Detalles</span>
+          </button>
+        </div>
       </div>
 
-      {/* Main Container */}
-      <main className="flex-1 flex overflow-hidden max-w-7xl w-full mx-auto shadow-2xl bg-slate-950">
-        
-        {/* Chat Area */}
-        <div
-          className={`flex-1 flex flex-col h-full overflow-hidden ${
-            activeTab === 'chat' ? 'flex' : 'hidden lg:flex'
-          }`}
-        >
-          <MessageList
-            messages={messages}
-            isLoading={isLoading}
-            onSelectTopic={handleSelectTopic}
-          />
+      <main className="app-workspace flex-1 min-h-0 overflow-hidden">
+        <div className="workspace-grid h-full min-h-0 w-full">
+          <section
+            className={`
+              workspace-panel workspace-panel--left
+              ${activeTab === 'info' ? 'flex' : 'hidden'}
+              lg:flex
+            `}
+          >
+            <SessionInfoPanel sessionId={sessionId} onResetSession={handleResetSession} />
+          </section>
 
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-            inputPreset={presetTopic}
-          />
+          <section
+            className={`
+              workspace-panel workspace-panel--chat min-w-0
+              ${activeTab === 'chat' ? 'flex' : 'hidden'}
+              lg:flex
+            `}
+          >
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              onSelectTopic={handleSelectTopic}
+            />
+
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              inputPreset={presetTopic}
+            />
+          </section>
+
+          <section
+            className={`
+              workspace-panel workspace-panel--right
+              ${activeTab === 'nexu' ? 'flex' : 'hidden'}
+              lg:flex
+            `}
+          >
+            <NexuPanel
+              analysis={nexuAnalysis}
+              isLoading={isNexuLoading}
+            />
+          </section>
         </div>
-
-        {/* Sidebar / Info Panel */}
-        <div
-          className={`h-full overflow-y-auto ${
-            activeTab === 'info' ? 'flex w-full' : 'hidden lg:flex'
-          }`}
-        >
-          <SessionInfoPanel sessionId={sessionId} />
-        </div>
-
       </main>
-
     </div>
   );
 }

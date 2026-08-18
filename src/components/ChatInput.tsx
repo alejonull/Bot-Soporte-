@@ -43,7 +43,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 132)}px`;
     }
   }, [text]);
 
@@ -67,9 +67,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="px-3 py-2.5 sm:p-4 bg-slate-900 border-t border-slate-800">
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto relative">
-        <div className="relative flex items-center sm:items-end rounded-xl bg-slate-800/90 border border-slate-700/80 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/50 shadow-inner transition-all">
+    <div className="border-t border-slate-800/80 bg-slate-950/90 px-4 py-3 lg:px-6 lg:py-4">
+      <form onSubmit={handleSubmit} className="mx-auto max-w-5xl">
+        <div className="flex items-end gap-3 rounded-2xl border border-slate-700/80 bg-slate-900/90 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] transition-colors focus-within:border-cyan-500/50 focus-within:ring-1 focus-within:ring-cyan-500/30">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -77,37 +77,37 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            placeholder={isMobile ? 'Describe tu problema...' : 'Describe tu problema tecnico aqui­...'}
-            className="w-full bg-transparent text-slate-100 placeholder-slate-400 text-[15px] sm:text-sm px-4 py-3.5 focus:outline-none resize-none max-h-32 min-h-[52px] sm:min-h-[48px] disabled:opacity-50"
+            placeholder={isMobile ? 'Describe tu problema...' : 'Describe tu problema técnico aquí...'}
+            className="min-h-[48px] w-full resize-none bg-transparent px-1 py-2 text-[15px] leading-6 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:opacity-50"
           />
 
-          <div className="flex items-center self-stretch px-2 py-2 space-x-2">
-            <button
-              type="submit"
-              disabled={!text.trim() || isLoading}
-              className={`inline-flex items-center justify-center p-2.5 rounded-lg text-white transition-all font-medium ${
-                !text.trim() || isLoading
-                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-60'
-                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/20 active:scale-95'
-              }`}
-              title="Enviar mensaje"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={!text.trim() || isLoading}
+            className={`inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-all ${
+              !text.trim() || isLoading
+                ? 'cursor-not-allowed bg-slate-800 text-slate-500 opacity-60'
+                : 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 active:scale-95'
+            }`}
+            title="Enviar mensaje"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </button>
         </div>
 
-        <div className="hidden sm:flex justify-between items-center px-2 mt-1.5 text-[11px] text-slate-400">
-          <span className="flex items-center gap-1">
-            <CornerDownLeft className="w-3 h-3 text-slate-400" />
-            <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px]">Enter</kbd> para enviar
+        <div className="mt-2 hidden items-center justify-between px-1 text-[11px] text-slate-500 sm:flex">
+          <span className="inline-flex items-center gap-1.5">
+            <CornerDownLeft className="h-3.5 w-3.5" />
+            <kbd className="rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 font-mono text-[10px] text-slate-300">Enter</kbd>
+            para enviar
           </span>
           <span>
-            <kbd className="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 font-mono text-[10px]">Shift + Enter</kbd> para salto de línea
+            <kbd className="rounded border border-slate-700 bg-slate-900 px-1.5 py-0.5 font-mono text-[10px] text-slate-300">Shift + Enter</kbd>
+            {' '}salto de línea
           </span>
         </div>
       </form>

@@ -6,8 +6,7 @@ import { analyzeConversation, NexuAnalysis } from './services/nexuService';
 import { Header } from './components/Header';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
-import { SessionInfoPanel } from './components/SessionInfoPanel';
-import { MessageSquare, Info, PanelLeft } from 'lucide-react';
+import { MessageSquare, PanelLeft } from 'lucide-react';
 import { NexuPanel } from './components/NexuPanel';
 
 export default function App() {
@@ -15,7 +14,7 @@ export default function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [presetTopic, setPresetTopic] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'nexu' | 'info'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'nexu'>('chat');
   const [nexuAnalysis, setNexuAnalysis] = useState<NexuAnalysis | null>(null);
   const [isNexuLoading, setIsNexuLoading] = useState<boolean>(false);
 
@@ -123,11 +122,11 @@ export default function App() {
   };
 
   return (
-    <div className="app-shell flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100 antialiased select-none">
+    <div className="app-shell flex h-screen w-screen flex-col overflow-hidden text-[#252525] antialiased">
       <Header onResetSession={handleResetSession} />
 
-      <div className="lg:hidden border-b border-slate-800/80 bg-slate-950/90 backdrop-blur">
-        <div className="grid grid-cols-3 text-xs font-semibold">
+      <div className="lg:hidden border-b border-[var(--border)] bg-[rgba(250,249,246,0.94)] px-4 py-3 backdrop-blur">
+        <div className="grid grid-cols-2 rounded-2xl border border-[var(--border)] bg-white p-1 text-sm font-medium shadow-[0_6px_24px_rgba(40,35,25,0.04)]">
           <button
             onClick={() => setActiveTab('chat')}
             className={`mobile-tab ${activeTab === 'chat' ? 'mobile-tab--active' : ''}`}
@@ -142,13 +141,6 @@ export default function App() {
             <PanelLeft className="h-4 w-4" />
             <span>NEXU</span>
           </button>
-          <button
-            onClick={() => setActiveTab('info')}
-            className={`mobile-tab ${activeTab === 'info' ? 'mobile-tab--active' : ''}`}
-          >
-            <Info className="h-4 w-4" />
-            <span>Detalles</span>
-          </button>
         </div>
       </div>
 
@@ -156,37 +148,29 @@ export default function App() {
         <div className="workspace-grid h-full min-h-0 w-full">
           <section
             className={`
-              workspace-panel workspace-panel--left
-              ${activeTab === 'info' ? 'flex' : 'hidden'}
-              lg:flex
-            `}
-          >
-            <SessionInfoPanel sessionId={sessionId} onResetSession={handleResetSession} />
-          </section>
-
-          <section
-            className={`
               workspace-panel workspace-panel--chat min-w-0
               ${activeTab === 'chat' ? 'flex' : 'hidden'}
               lg:flex
             `}
           >
-            <MessageList
-              messages={messages}
-              isLoading={isLoading}
-              onSelectTopic={handleSelectTopic}
-            />
+            <div className="flex h-full min-h-0 w-full flex-col">
+              <MessageList
+                messages={messages}
+                isLoading={isLoading}
+                onSelectTopic={handleSelectTopic}
+              />
 
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              inputPreset={presetTopic}
-            />
+              <ChatInput
+                onSendMessage={handleSendMessage}
+                isLoading={isLoading}
+                inputPreset={presetTopic}
+              />
+            </div>
           </section>
 
           <section
             className={`
-              workspace-panel workspace-panel--right
+              workspace-panel workspace-panel--right min-w-0
               ${activeTab === 'nexu' ? 'flex' : 'hidden'}
               lg:flex
             `}
@@ -194,6 +178,7 @@ export default function App() {
             <NexuPanel
               analysis={nexuAnalysis}
               isLoading={isNexuLoading}
+              sessionId={sessionId}
             />
           </section>
         </div>

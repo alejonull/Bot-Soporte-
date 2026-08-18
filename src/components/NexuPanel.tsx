@@ -1,14 +1,18 @@
 import React from 'react';
+import { Check, Circle, Loader2, Sparkles, ArrowRight } from 'lucide-react';
 import { NexuAnalysis } from '../services/nexuService';
+import { SessionInfoPanel } from './SessionInfoPanel';
 
 interface NexuPanelProps {
   analysis: NexuAnalysis | null;
   isLoading: boolean;
+  sessionId: string;
 }
 
 export const NexuPanel: React.FC<NexuPanelProps> = ({
   analysis,
   isLoading,
+  sessionId,
 }) => {
   const collectedCount = analysis
     ? Object.values(analysis.datosRecolectados).filter(Boolean).length
@@ -16,140 +20,214 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
   const totalData: number = 5;
   const progress = totalData === 0 ? 0 : (collectedCount / totalData) * 100;
 
-  if (isLoading && !analysis) {
-    return (
-      <div className="panel-surface h-full w-full overflow-y-auto p-4 lg:p-4">
-        <PanelHeader />
-        <EmptyState text="Analizando conversación..." />
-      </div>
-    );
-  }
-
-  if (!analysis) {
-    return (
-      <div className="panel-surface h-full w-full overflow-y-auto p-4 lg:p-4">
-        <PanelHeader />
-        <EmptyState text="El análisis aparecerá cuando avance la conversación." />
-      </div>
-    );
-  }
-
   return (
-    <div className="panel-surface h-full w-full overflow-y-auto p-4 lg:p-4">
-      <div className="space-y-3.5">
-        <PanelHeader />
-
-        <section className="panel-section !p-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="section-label">Estado</div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <span className="badge badge--info">{analysis.estadoCaso}</span>
-                <span className="badge badge--neutral">Análisis del caso</span>
-              </div>
+    <aside className="panel-surface flex h-full min-h-0 w-full flex-col overflow-y-auto px-4 py-4 lg:px-5">
+      <div className="space-y-4">
+        <header className="space-y-1.5 border-b border-[var(--border)] pb-4">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-[#FFD8BF] bg-[#FFF3EA] text-[#FF641E]">
+              <Sparkles className="h-4 w-4" />
+            </span>
+            <div>
+              <h2 className="text-[16px] font-semibold tracking-tight text-[#252525]">NEXU</h2>
+              <p className="text-xs text-[#74706A]">Análisis del caso</p>
             </div>
           </div>
-        </section>
 
-        <section className="panel-section !p-3">
-          <div className="section-label">Problema principal</div>
-          <p className="mt-2 text-sm leading-6 text-slate-200">
-            {analysis.problemaPrincipal}
-          </p>
-        </section>
-
-        <section className="panel-section !p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="section-label">Datos para cita</div>
-            <span className="badge badge--neutral">{collectedCount}/{totalData}</span>
-          </div>
-
-          <div className="mt-2 h-2 rounded-full bg-slate-800 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-
-          <div className="mt-3 space-y-1.5">
-            <DataRow label="Nombre" value={analysis.datosRecolectados.nombre} />
-            <DataRow label="Correo" value={analysis.datosRecolectados.correo} />
-            <DataRow label="Fecha" value={analysis.datosRecolectados.fecha} />
-            <DataRow label="Hora" value={analysis.datosRecolectados.hora} />
-            <DataRow label="Motivo" value={analysis.datosRecolectados.motivo} />
-          </div>
-        </section>
-
-        <section className="panel-section !p-3">
-          <div className="section-label">Resumen</div>
-          <p className="mt-2 text-sm leading-6 text-slate-200">
-            {analysis.resumen}
-          </p>
-        </section>
-
-        <section className="grid grid-cols-2 gap-2">
-          <CompactMetric label="Complejidad" value={analysis.complejidad} />
-          <CompactMetric label="Tono" value={analysis.tonoAparente} />
-        </section>
-
-        <section className="panel-section !p-3">
-          <div className="section-label">Revisión técnica</div>
-          <div className="mt-2">
-            <span className={`badge ${analysis.requiereRevisionTecnica ? 'badge--warn' : 'badge--success'}`}>
-              {analysis.requiereRevisionTecnica ? 'Recomendada' : 'No requerida'}
+          {analysis ? (
+            <StatusBadge estado={analysis.estadoCaso} />
+          ) : (
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border)] bg-[#F7F3EE] px-3 py-1.5 text-xs font-medium text-[#74706A]">
+              <span className="h-2 w-2 rounded-full bg-[#F5B82E]" />
+              Esperando conversación
             </span>
+          )}
+        </header>
+
+        {isLoading && !analysis ? (
+          <EmptyState
+            icon={<Loader2 className="h-4 w-4 animate-spin" />}
+            title="Actualizando análisis…"
+            text="NEXU está procesando los últimos mensajes."
+          />
+        ) : !analysis ? (
+          <EmptyState
+            icon={<Sparkles className="h-4 w-4" />}
+            title="Esperando conversación"
+            text="El análisis aparecerá cuando avance la conversación."
+          />
+        ) : (
+          <div className="space-y-4">
+            <InfoBlock title="Problema detectado">
+              <p className="text-[15px] leading-6 text-[#252525]">
+                {analysis.problemaPrincipal}
+              </p>
+            </InfoBlock>
+
+            <InfoBlock title="Datos para la cita" action={`${collectedCount}/${totalData}`}>
+              <div className="mt-3 h-2 rounded-full bg-[#F0E8DF]">
+                <div
+                  className="h-full rounded-full bg-[#FF641E] transition-all duration-200"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+
+              <div className="mt-3 space-y-2">
+                <DataRow label="Nombre" value={analysis.datosRecolectados.nombre} />
+                <DataRow label="Correo" value={analysis.datosRecolectados.correo} />
+                <DataRow label="Fecha" value={analysis.datosRecolectados.fecha} />
+                <DataRow label="Hora" value={analysis.datosRecolectados.hora} />
+                <DataRow label="Motivo" value={analysis.datosRecolectados.motivo} />
+              </div>
+            </InfoBlock>
+
+            <InfoBlock title="Resumen">
+              <p className="text-[14px] leading-6 text-[#252525]">{analysis.resumen}</p>
+            </InfoBlock>
+
+            <div className="grid grid-cols-2 gap-3">
+              <MetricCard label="Complejidad" value={analysis.complejidad} />
+              <MetricCard label="Tono" value={analysis.tonoAparente} />
+            </div>
+
+            <InfoBlock title="Siguiente acción sugerida" accent>
+              <div className="flex items-start gap-2">
+                <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#FF641E]" />
+                <p className="text-[15px] font-medium leading-6 text-[#252525]">
+                  {analysis.siguienteAccion}
+                </p>
+              </div>
+            </InfoBlock>
+
+            {isLoading && (
+              <div className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-white px-3 py-2 text-xs text-[#74706A]">
+                <span className="h-2 w-2 rounded-full bg-[#FF641E] animate-pulse" />
+                Actualizando análisis…
+              </div>
+            )}
           </div>
-        </section>
+        )}
 
-        <section className="panel-section panel-section--accent !p-3">
-          <div className="section-label section-label--accent">Siguiente acción</div>
-          <p className="mt-2 text-sm leading-6 font-medium text-slate-50">
-            {analysis.siguienteAccion}
-          </p>
-        </section>
-
-        {isLoading && <div className="text-xs text-slate-500">Actualizando análisis...</div>}
+        <div className="border-t border-[var(--border)] pt-4">
+          <SessionInfoPanel sessionId={sessionId} />
+        </div>
       </div>
-    </div>
+    </aside>
   );
 };
 
-const PanelHeader = () => (
-  <header className="space-y-1">
-    <h2 className="text-base font-semibold tracking-tight text-slate-100">NEXU</h2>
-    <p className="text-xs text-slate-400">Análisis del caso</p>
-    <span className="badge badge--info mt-1">En diagnóstico</span>
-  </header>
-);
+const StatusBadge: React.FC<{ estado: NexuAnalysis['estadoCaso'] }> = ({ estado }) => {
+  const config = getStatusConfig(estado);
 
-const EmptyState: React.FC<{ text: string }> = ({ text }) => (
-  <div className="mt-4 rounded-xl border border-dashed border-slate-800/80 bg-slate-950/40 px-3 py-4 text-sm text-slate-500">
-    {text}
+  return (
+    <span
+      className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${config.className}`}
+    >
+      <span className={`h-2 w-2 rounded-full ${config.dotClassName}`} />
+      {config.label}
+    </span>
+  );
+};
+
+const EmptyState: React.FC<{ icon: React.ReactNode; title: string; text: string }> = ({
+  icon,
+  title,
+  text,
+}) => (
+  <div className="rounded-[20px] border border-[var(--border)] bg-[#F7F3EE] px-4 py-4">
+    <div className="flex items-center gap-2 text-sm font-medium text-[#252525]">
+      <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#FF641E] shadow-[0_4px_16px_rgba(40,35,25,0.04)]">
+        {icon}
+      </span>
+      {title}
+    </div>
+    <p className="mt-2 text-sm leading-6 text-[#74706A]">{text}</p>
   </div>
 );
 
-interface DataRowProps {
-  label: string;
-  value: boolean;
+const InfoBlock: React.FC<{
+  title: string;
+  action?: string;
+  accent?: boolean;
+  children: React.ReactNode;
+}> = ({ title, action, accent, children }) => (
+  <section
+    className={`rounded-[20px] border px-4 py-4 ${
+      accent ? 'border-[#FFD8BF] bg-[#FFF7F1]' : 'border-[var(--border)] bg-white'
+    }`}
+  >
+    <div className="flex items-center justify-between gap-3">
+      <h3 className="text-[14px] font-semibold text-[#252525]">{title}</h3>
+      {action ? <span className="text-xs font-medium text-[#74706A]">{action}</span> : null}
+    </div>
+    <div className="mt-3">{children}</div>
+  </section>
+);
+
+const DataRow: React.FC<{ label: string; value: boolean }> = ({ label, value }) => (
+  <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[#FAF9F6] px-3 py-2.5">
+    <span className="text-sm text-[#252525]">{label}</span>
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+        value ? 'text-[#4FA45F]' : 'text-[#A19D96]'
+      }`}
+    >
+      {value ? <Check className="h-3.5 w-3.5" /> : <Circle className="h-3.5 w-3.5" />}
+      {value ? 'Recolectado' : 'Pendiente'}
+    </span>
+  </div>
+);
+
+const MetricCard: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div className="rounded-[18px] border border-[var(--border)] bg-white px-4 py-3">
+    <div className="text-[12px] text-[#A19D96]">{label}</div>
+    <div className="mt-1 text-[14px] font-semibold text-[#252525]">{value}</div>
+  </div>
+);
+
+function getStatusConfig(estado: NexuAnalysis['estadoCaso']) {
+  switch (estado) {
+    case 'En diagnóstico':
+      return {
+        label: 'En diagnóstico',
+        className: 'border-[#FFD8BF] bg-[#FFF0E5] text-[#F45B13]',
+        dotClassName: 'bg-[#FF641E]',
+      };
+    case 'Resuelto':
+      return {
+        label: 'Resuelto',
+        className: 'border-[#CDE8D2] bg-[#EEF7EF] text-[#4FA45F]',
+        dotClassName: 'bg-[#4FA45F]',
+      };
+    case 'Pendiente':
+      return {
+        label: 'Pendiente',
+        className: 'border-[#F0E0A5] bg-[#FFF6DA] text-[#B07A00]',
+        dotClassName: 'bg-[#F5B82E]',
+      };
+    case 'Requiere revisión técnica':
+      return {
+        label: 'Revisión técnica',
+        className: 'border-[#F5C7C0] bg-[#FDECEC] text-[#D95040]',
+        dotClassName: 'bg-[#D95040]',
+      };
+    case 'Cita en proceso':
+      return {
+        label: 'Cita en proceso',
+        className: 'border-[#FFD8BF] bg-[#FFF7F1] text-[#F45B13]',
+        dotClassName: 'bg-[#FF641E]',
+      };
+    case 'Cita agendada':
+      return {
+        label: 'Cita agendada',
+        className: 'border-[#CDE8D2] bg-[#EEF7EF] text-[#4FA45F]',
+        dotClassName: 'bg-[#4FA45F]',
+      };
+    default:
+      return {
+        label: estado,
+        className: 'border-[#E5E0D8] bg-[#F7F3EE] text-[#74706A]',
+        dotClassName: 'bg-[#A19D96]',
+      };
+  }
 }
-
-const DataRow: React.FC<DataRowProps> = ({ label, value }) => {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-800/70 bg-slate-950/40 px-3 py-2">
-      <span className="text-sm text-slate-300">{label}</span>
-      <span className="badge badge--neutral">
-        <span className={`h-1.5 w-1.5 rounded-full ${value ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-        {value ? 'Recolectado' : 'Pendiente'}
-      </span>
-    </div>
-  );
-};
-
-const CompactMetric: React.FC<{ label: string; value: string }> = ({ label, value }) => {
-  return (
-    <div className="rounded-xl border border-slate-800/80 bg-slate-900/80 px-3 py-2.5">
-      <div className="text-[11px] uppercase tracking-[0.16em] text-slate-500">{label}</div>
-      <div className="mt-1 text-sm font-semibold text-slate-100">{value}</div>
-    </div>
-  );
-};

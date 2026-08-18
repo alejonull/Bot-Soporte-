@@ -1,7 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --bg: #f3f0e9;
+  --surface: #faf9f6;
+  --surface-2: #f7f3ee;
+  --card: #ffffff;
+  --border: #e5e0d8;
+  --text: #252525;
+  --text-secondary: #74706a;
+  --text-muted: #a19d96;
+  --orange: #ff641e;
+  --orange-hover: #ea5413;
+  --orange-soft: #ffe6d6;
+  --yellow: #f5b82e;
+  --green: #4fa45f;
+  --red: #d95040;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 html,
@@ -9,54 +24,63 @@ body,
 #root {
   height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 28%),
-    radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 22%),
-    linear-gradient(180deg, #020617 0%, #030712 100%);
+    radial-gradient(circle at top left, rgba(255, 100, 30, 0.08), transparent 26%),
+    radial-gradient(circle at top right, rgba(245, 184, 46, 0.07), transparent 22%),
+    linear-gradient(180deg, #f6f2eb 0%, #f1ede5 100%);
 }
 
 body {
   margin: 0;
   overflow: hidden;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+textarea {
+  font: inherit;
 }
 
 .app-shell {
   background:
-    radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.07), transparent 24%),
-    radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.06), transparent 22%),
-    linear-gradient(180deg, #020617 0%, #030712 100%);
+    radial-gradient(circle at 10% 0%, rgba(255, 100, 30, 0.08), transparent 22%),
+    radial-gradient(circle at 100% 0%, rgba(245, 184, 46, 0.06), transparent 20%),
+    linear-gradient(180deg, rgba(243, 240, 233, 1) 0%, rgba(250, 249, 246, 1) 100%);
 }
 
 .app-workspace {
-  padding: 0.6rem;
+  padding: 0.75rem;
 }
 
 @media (min-width: 1024px) {
   .app-workspace {
-    padding: 0.85rem;
+    padding: 0.95rem;
   }
 }
 
 .workspace-grid {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.75rem;
   min-height: 0;
 }
 
 @media (min-width: 1024px) {
   .workspace-grid {
-    grid-template-columns: minmax(220px, 13%) minmax(0, 1fr) minmax(280px, 24%);
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.42fr);
   }
 }
 
 .workspace-panel {
   min-height: 0;
   min-width: 0;
-  border: 1px solid rgba(51, 65, 85, 0.8);
-  background: linear-gradient(180deg, rgba(3, 7, 18, 0.92), rgba(2, 6, 23, 0.96));
-  box-shadow:
-    0 20px 60px rgba(2, 6, 23, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
-  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 249, 246, 0.98));
+  box-shadow: 0 6px 24px rgba(40, 35, 25, 0.05);
+  border-radius: 24px;
   overflow: hidden;
 }
 
@@ -65,7 +89,6 @@ body {
   flex-direction: column;
 }
 
-.workspace-panel--left,
 .workspace-panel--right {
   display: flex;
   flex-direction: column;
@@ -73,70 +96,8 @@ body {
 
 .panel-surface {
   background:
-    linear-gradient(180deg, rgba(2, 6, 23, 0.88), rgba(3, 7, 18, 0.96)),
-    rgba(15, 23, 42, 0.72);
-}
-
-.panel-section {
-  border: 1px solid rgba(51, 65, 85, 0.75);
-  background: rgba(15, 23, 42, 0.62);
-  border-radius: 0.9rem;
-  padding: 0.8rem;
-}
-
-.panel-section--accent {
-  border-color: rgba(34, 211, 238, 0.22);
-  background: linear-gradient(180deg, rgba(8, 47, 73, 0.36), rgba(15, 23, 42, 0.7));
-}
-
-.section-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgb(100 116 139);
-}
-
-.section-label--accent {
-  color: rgb(125 211 252);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(71, 85, 105, 0.85);
-  background: rgba(15, 23, 42, 0.8);
-  padding: 0.32rem 0.6rem;
-  font-size: 0.7rem;
-  line-height: 1;
-  font-weight: 700;
-  color: rgb(226 232 240);
-}
-
-.badge--info {
-  border-color: rgba(34, 211, 238, 0.25);
-  background: rgba(8, 47, 73, 0.55);
-  color: rgb(125 211 252);
-}
-
-.badge--success {
-  border-color: rgba(16, 185, 129, 0.25);
-  background: rgba(6, 78, 59, 0.4);
-  color: rgb(110 231 183);
-}
-
-.badge--warn {
-  border-color: rgba(245, 158, 11, 0.25);
-  background: rgba(120, 53, 15, 0.38);
-  color: rgb(251 191 36);
-}
-
-.badge--neutral {
-  border-color: rgba(71, 85, 105, 0.85);
-  background: rgba(15, 23, 42, 0.88);
-  color: rgb(226 232 240);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 249, 246, 0.99)),
+    var(--surface);
 }
 
 .mobile-tab {
@@ -145,21 +106,25 @@ body {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.85rem 0.5rem;
-  color: rgb(100 116 139);
-  border-bottom: 2px solid transparent;
-  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  color: var(--text-secondary);
+  border-radius: 1rem;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .mobile-tab--active {
-  color: rgb(103 232 249);
-  border-color: rgb(34 211 238);
-  background: rgba(15, 23, 42, 0.72);
+  color: var(--orange);
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(40, 35, 25, 0.05);
 }
 
 .chat-scrollbar,
 .panel-surface {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #020617;
+  scrollbar-color: #d9d1c4 #f3f0e9;
   scrollbar-gutter: stable;
 }
 
@@ -170,20 +135,20 @@ body {
 
 .chat-scrollbar::-webkit-scrollbar-track,
 .panel-surface::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f3f0e9;
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb,
 .panel-surface::-webkit-scrollbar-thumb {
-  background-color: #3a4a61;
+  background-color: #d9d1c4;
   border-radius: 9999px;
-  border: 2px solid #020617;
+  border: 2px solid #f3f0e9;
   background-clip: padding-box;
 }
 
 .chat-scrollbar::-webkit-scrollbar-thumb:hover,
 .panel-surface::-webkit-scrollbar-thumb:hover {
-  background-color: #4b5d75;
+  background-color: #c8bfb0;
 }
 
 .chat-scrollbar::-webkit-scrollbar-button,
@@ -195,5 +160,21 @@ body {
 
 .chat-scrollbar::-webkit-scrollbar-corner,
 .panel-surface::-webkit-scrollbar-corner {
-  background: #020617;
+  background: #f3f0e9;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 180ms ease-out;
 }

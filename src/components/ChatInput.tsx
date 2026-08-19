@@ -107,7 +107,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <kbd className="rounded border border-[var(--border)] bg-white px-1.5 py-0.5 font-mono text-[10px] text-[#74706A]">
               Shift + Enter
             </kbd>
-            {' '}salto de línea
+            {' '}Salto de línea
           </span>
         </div>
       </form>

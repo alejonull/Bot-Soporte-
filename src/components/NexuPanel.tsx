@@ -7,12 +7,16 @@ interface NexuPanelProps {
   analysis: NexuAnalysis | null;
   isLoading: boolean;
   sessionId: string;
+  showSessionInfo?: boolean;
+  isDrawer?: boolean;
 }
 
 export const NexuPanel: React.FC<NexuPanelProps> = ({
   analysis,
   isLoading,
   sessionId,
+  showSessionInfo = true,
+  isDrawer = false,
 }) => {
   const collectedCount = analysis
     ? Object.values(analysis.datosRecolectados).filter(Boolean).length
@@ -20,8 +24,12 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
   const totalData: number = 5;
   const progress = totalData === 0 ? 0 : (collectedCount / totalData) * 100;
 
+  const rootClassName = isDrawer
+    ? 'panel-surface flex w-full flex-col overflow-visible px-4 py-4'
+    : 'panel-surface flex h-full min-h-0 w-full flex-col overflow-y-auto px-4 py-4 lg:px-5';
+
   return (
-    <aside className="panel-surface flex h-full min-h-0 w-full flex-col overflow-y-auto px-4 py-4 lg:px-5">
+    <aside className={rootClassName}>
       <div className="space-y-4">
         <header className="space-y-1.5 border-b border-[var(--border)] pb-4">
           <div className="flex items-center gap-2">
@@ -30,7 +38,7 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
             </span>
             <div>
               <h2 className="text-[16px] font-semibold tracking-tight text-[#252525]">NEXU</h2>
-              <p className="text-xs text-[#74706A]">Análisis del caso</p>
+              <p className="text-xs text-[#74706A]">Analisis del caso</p>
             </div>
           </div>
 
@@ -39,7 +47,7 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
           ) : (
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[var(--border)] bg-[#F7F3EE] px-3 py-1.5 text-xs font-medium text-[#74706A]">
               <span className="h-2 w-2 rounded-full bg-[#F5B82E]" />
-              Esperando conversación
+              Esperando conversacíon
             </span>
           )}
         </header>
@@ -47,14 +55,14 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
         {isLoading && !analysis ? (
           <EmptyState
             icon={<Loader2 className="h-4 w-4 animate-spin" />}
-            title="Actualizando análisis…"
-            text="NEXU está procesando los últimos mensajes."
+            title="Actualizando analisis"
+            text="NEXU esta procesando los ultimos mensajes."
           />
         ) : !analysis ? (
           <EmptyState
             icon={<Sparkles className="h-4 w-4" />}
             title="Esperando conversación"
-            text="El análisis aparecerá cuando avance la conversación."
+            text="El analisis aparecera cuando avance la conversación."
           />
         ) : (
           <div className="space-y-4">
@@ -90,7 +98,7 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
               <MetricCard label="Tono" value={analysis.tonoAparente} />
             </div>
 
-            <InfoBlock title="Siguiente acción sugerida" accent>
+            <InfoBlock title="Siguiente acciÃ³n sugerida" accent>
               <div className="flex items-start gap-2">
                 <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#FF641E]" />
                 <p className="text-[15px] font-medium leading-6 text-[#252525]">
@@ -102,15 +110,17 @@ export const NexuPanel: React.FC<NexuPanelProps> = ({
             {isLoading && (
               <div className="flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-white px-3 py-2 text-xs text-[#74706A]">
                 <span className="h-2 w-2 rounded-full bg-[#FF641E] animate-pulse" />
-                Actualizando análisis…
+                Actualizando analisis
               </div>
             )}
           </div>
         )}
 
-        <div className="border-t border-[var(--border)] pt-4">
-          <SessionInfoPanel sessionId={sessionId} />
-        </div>
+        {showSessionInfo ? (
+          <div className="border-t border-[var(--border)] pt-4">
+            <SessionInfoPanel sessionId={sessionId} />
+          </div>
+        ) : null}
       </div>
     </aside>
   );

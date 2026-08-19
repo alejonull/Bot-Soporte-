@@ -94,6 +94,18 @@ textarea {
   flex-direction: column;
 }
 
+@media (max-width: 1023.98px) {
+  .workspace-panel--right {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workspace-panel--right {
+    display: flex;
+  }
+}
+
 .panel-surface {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 249, 246, 0.99)),
